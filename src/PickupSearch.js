@@ -2,6 +2,19 @@ import React, {useState} from 'react';
 import './PickupSearch.css';
 import fetch from 'cross-fetch';
 
+const PickupSearchResults = ({results, searchTerm}) =>
+  results.length ? (
+    <ul className="c-pickup-search__results">
+      {results.map(result => (
+        <li key={result.index}>
+          {result.name} {result.iata && `(${result.iata})`}
+        </li>
+      ))}
+    </ul>
+  ) : searchTerm.length ? (
+    <div className="c-pickup-search__results">No results found</div>
+  ) : null;
+
 export const PickupSearch = () => {
   const [results, setResults] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,17 +43,7 @@ export const PickupSearch = () => {
           }}
         />
 
-        {results.length ? (
-          <ul className="c-pickup-search__results">
-            {results.map(result => (
-              <li key={result.index}>
-                {result.name} {result.iata && `(${result.iata})`}
-              </li>
-            ))}
-          </ul>
-        ) : searchTerm.length ? (
-          <div className="c-pickup-search__results">No results found</div>
-        ) : null}
+        <PickupSearchResults results={results} searchTerm={searchTerm} />
       </div>
     </form>
   );
