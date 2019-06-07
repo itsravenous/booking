@@ -4,7 +4,7 @@ import fetch from 'cross-fetch';
 
 const PickupSearchResults = ({results, searchTerm}) =>
   results.length ? (
-    <ul className="c-pickup-search__results">
+    <ul aria-live="assertive" className="c-pickup-search__results">
       {results.map(result => (
         <li key={result.index}>
           {result.name} {result.iata && `(${result.iata})`}
