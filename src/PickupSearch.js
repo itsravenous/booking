@@ -4,6 +4,7 @@ import fetch from 'cross-fetch';
 
 export const PickupSearch = () => {
   const [results, setResults] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   return (
     <form className="c-pickup-search">
       <h2 className="c-heading">Where are you going?</h2>
@@ -15,7 +16,11 @@ export const PickupSearch = () => {
           placeholder="city, airport, station, region, district…"
           onChange={async e => {
             const searchTerm = e.target.value;
-            if (searchTerm.length < 2) return;
+            setSearchTerm(searchTerm);
+            if (searchTerm.length < 2) {
+              setResults([]);
+              return;
+            }
             const response = await fetch(
               `https://cors.io?https://www.rentalcars.com/FTSAutocomplete.do?solrIndex=fts_en&solrRows=6&solrTerm=${searchTerm}`,
             );
@@ -33,9 +38,9 @@ export const PickupSearch = () => {
               </li>
             ))}
           </ul>
-        ) : (
+        ) : searchTerm.length ? (
           <div className="c-pickup-search__results">No results found</div>
-        )}
+        ) : null}
       </div>
     </form>
   );

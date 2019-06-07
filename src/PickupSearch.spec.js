@@ -97,5 +97,29 @@ describe('Pick-up search widget', () => {
       await findByText('No results found');
       expect(scope.isDone()).toBe(true);
     });
+
+    it('hides the results list when the search field text is deleted', async () => {
+      const scope = nock('https://cors.io?')
+        .get('/')
+        .query({
+          'https://www.rentalcars.com/FTSAutocomplete.do?solrIndex': 'fts_en',
+          solrRows: 6,
+          solrTerm: 'MA',
+        })
+        .reply(200, pickupSearchResults);
+
+      const {
+        queryByLabelText,
+        findByText,
+        queryByText,
+        queryAllByText,
+      } = render(<PickupSearch />);
+      const searchInput = queryByLabelText('Pick-up Location');
+      fireEvent.change(searchInput, {target: {value: 'MA'}});
+      await findByText(/Manchester Airport/);
+      fireEvent.change(searchInput, {target: {value: ''}});
+      expect(queryByText(/Manchester Airport/)).not.toBeInTheDocument();
+      expect(scope.isDone()).toBe(true);
+    });
   });
 });
