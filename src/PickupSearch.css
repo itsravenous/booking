@@ -1,0 +1,10 @@
+.c-pickup-search {
+  background-color: #f3ce56;
+  color: #444;
+  padding: 1.5rem;
+}
+
+.c-pickup-search input {
+  display: block;
+  width: 100%;
+}
