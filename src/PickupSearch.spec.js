@@ -1,6 +1,14 @@
 import 'jest-dom/extend-expect';
 import React from 'react';
-import {render} from '@testing-library/react';
+import nock from 'nock';
+import pickupSearchResults from './fixtures/pickup-search-results';
+import pickupSearchResultsEmpty from './fixtures/pickup-search-results-empty';
+import {
+  wait,
+  waitForElementToBeRemoved,
+  render,
+  fireEvent,
+} from '@testing-library/react';
 import {PickupSearch} from './PickupSearch';
 
 describe('Pick-up search widget', () => {
@@ -21,5 +29,73 @@ describe('Pick-up search widget', () => {
       'placeholder',
       'city, airport, station, region, district…',
     );
+  });
+
+  describe('search auto-complete', () => {
+    it("doesn't fetch results if only one character is entered", async () => {
+      const scope = nock('https://cors.io?')
+        .get('/')
+        .reply(200, pickupSearchResults);
+
+      const {queryByText, queryByLabelText, findByText} = render(
+        <PickupSearch />,
+      );
+      const searchInput = queryByLabelText('Pick-up Location');
+      fireEvent.change(searchInput, {target: {value: 'M'}});
+      await wait();
+      expect(scope.isDone()).toBe(false);
+    });
+
+    it('fetches and displays results when at least two characters are entered', async () => {
+      const scope = nock('https://cors.io?')
+        .get('/')
+        .query({
+          'https://www.rentalcars.com/FTSAutocomplete.do?solrIndex': 'fts_en',
+          solrRows: 6,
+          solrTerm: 'MA',
+        })
+        .reply(200, pickupSearchResults);
+
+      const {queryByLabelText, findByText} = render(<PickupSearch />);
+      const searchInput = queryByLabelText('Pick-up Location');
+      fireEvent.change(searchInput, {target: {value: 'MA'}});
+      const result = await findByText(/Manchester Airport/);
+      expect(result).toHaveTextContent('(MAN)');
+      expect(scope.isDone()).toBe(true);
+    });
+
+    it('hides IATA text for non-airport locations', async () => {
+      const scope = nock('https://cors.io?')
+        .get('/')
+        .query({
+          'https://www.rentalcars.com/FTSAutocomplete.do?solrIndex': 'fts_en',
+          solrRows: 6,
+          solrTerm: 'MA',
+        })
+        .reply(200, pickupSearchResults);
+
+      const {queryByLabelText, findByText} = render(<PickupSearch />);
+      const searchInput = queryByLabelText('Pick-up Location');
+      fireEvent.change(searchInput, {target: {value: 'MA'}});
+      await findByText('Manhattan');
+      expect(scope.isDone()).toBe(true);
+    });
+
+    it('handles no results found', async () => {
+      const scope = nock('https://cors.io?')
+        .get('/')
+        .query({
+          'https://www.rentalcars.com/FTSAutocomplete.do?solrIndex': 'fts_en',
+          solrRows: 6,
+          solrTerm: 'XZF',
+        })
+        .reply(200, pickupSearchResultsEmpty);
+
+      const {queryByLabelText, findByText} = render(<PickupSearch />);
+      const searchInput = queryByLabelText('Pick-up Location');
+      fireEvent.change(searchInput, {target: {value: 'XZF'}});
+      await findByText('No results found');
+      expect(scope.isDone()).toBe(true);
+    });
   });
 });
