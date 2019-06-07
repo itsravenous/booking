@@ -32,6 +32,16 @@ describe('Pick-up search widget', () => {
   });
 
   describe('search auto-complete', () => {
+    const setupNock = (searchTerm, results = pickupSearchResults) =>
+      nock('https://cors.io?')
+        .get('/')
+        .query({
+          'https://www.rentalcars.com/FTSAutocomplete.do?solrIndex': 'fts_en',
+          solrRows: 6,
+          solrTerm: searchTerm,
+        })
+        .reply(200, results);
+
     it("doesn't fetch results if only one character is entered", async () => {
       const scope = nock('https://cors.io?')
         .get('/')
@@ -47,15 +57,7 @@ describe('Pick-up search widget', () => {
     });
 
     it('fetches and displays results when at least two characters are entered', async () => {
-      const scope = nock('https://cors.io?')
-        .get('/')
-        .query({
-          'https://www.rentalcars.com/FTSAutocomplete.do?solrIndex': 'fts_en',
-          solrRows: 6,
-          solrTerm: 'MA',
-        })
-        .reply(200, pickupSearchResults);
-
+      const scope = setupNock('MA');
       const {queryByLabelText, findByText} = render(<PickupSearch />);
       const searchInput = queryByLabelText('Pick-up Location');
       fireEvent.change(searchInput, {target: {value: 'MA'}});
@@ -65,14 +67,7 @@ describe('Pick-up search widget', () => {
     });
 
     it('hides IATA text for non-airport locations', async () => {
-      const scope = nock('https://cors.io?')
-        .get('/')
-        .query({
-          'https://www.rentalcars.com/FTSAutocomplete.do?solrIndex': 'fts_en',
-          solrRows: 6,
-          solrTerm: 'MA',
-        })
-        .reply(200, pickupSearchResults);
+      const scope = setupNock('MA');
 
       const {queryByLabelText, findByText} = render(<PickupSearch />);
       const searchInput = queryByLabelText('Pick-up Location');
@@ -82,14 +77,7 @@ describe('Pick-up search widget', () => {
     });
 
     it('handles no results found', async () => {
-      const scope = nock('https://cors.io?')
-        .get('/')
-        .query({
-          'https://www.rentalcars.com/FTSAutocomplete.do?solrIndex': 'fts_en',
-          solrRows: 6,
-          solrTerm: 'XZF',
-        })
-        .reply(200, pickupSearchResultsEmpty);
+      const scope = setupNock('XZF', pickupSearchResultsEmpty);
 
       const {queryByLabelText, findByText} = render(<PickupSearch />);
       const searchInput = queryByLabelText('Pick-up Location');
@@ -99,14 +87,7 @@ describe('Pick-up search widget', () => {
     });
 
     it('hides the results list when the search field text is deleted', async () => {
-      const scope = nock('https://cors.io?')
-        .get('/')
-        .query({
-          'https://www.rentalcars.com/FTSAutocomplete.do?solrIndex': 'fts_en',
-          solrRows: 6,
-          solrTerm: 'MA',
-        })
-        .reply(200, pickupSearchResults);
+      const scope = setupNock('MA');
 
       const {
         queryByLabelText,
