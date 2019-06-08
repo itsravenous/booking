@@ -54,6 +54,7 @@ describe('Pick-up search widget', () => {
       fireEvent.change(searchInput, {target: {value: 'M'}});
       await wait();
       expect(scope.isDone()).toBe(false);
+      expect(queryByText('No results found')).not.toBeInTheDocument();
     });
 
     it('fetches and displays results when at least two characters are entered', async () => {

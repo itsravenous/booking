@@ -11,7 +11,7 @@ const PickupSearchResults = ({results, searchTerm}) =>
         </li>
       ))}
     </ul>
-  ) : searchTerm.length ? (
+  ) : searchTerm.length > 1 ? (
     <div className="c-pickup-search__results">No results found</div>
   ) : null;
 
