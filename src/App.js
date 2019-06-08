@@ -4,7 +4,7 @@ import {PickupSearch} from './PickupSearch';
 
 function App() {
   return (
-    <div className="App">
+    <div className="c-page-home">
       <PickupSearch />
     </div>
   );

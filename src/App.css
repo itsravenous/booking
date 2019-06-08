@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans|Ubuntu&display=swap');
 
+/* Base */
 * {
   box-sizing: border-box;
 }
@@ -8,6 +9,7 @@ body {
   font-family: 'Open Sans', 'Segoe UI', sans-serif;
 }
 
+/* Global components */
 .c-heading {
   margin: 0 0 1rem 0;
   font-family: 'Ubuntu', 'Segoe UI', sans-serif;
@@ -25,4 +27,12 @@ body {
   border: 1px solid #c8ae5b;
   font-size: 0.875rem;
   font-family: inherit;
+}
+
+/* Homepage */
+@media screen and (min-width: 480px) {
+  .c-page-home .c-pickup-search {
+    max-width: 30rem;
+    margin: 0 auto;
+  }
 }
