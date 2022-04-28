@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@testing-library/react": "^8.0.1",
-    "cross-fetch": "^3.0.3",
+    "cross-fetch": "^3.1.5",
     "jest-dom": "^3.4.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
